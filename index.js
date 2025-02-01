@@ -30,6 +30,15 @@ async function run() {
     await client.connect();
     //  database collection
     const rommCollection = client.db("opal-blosomDb").collection("roomsDB");
+    const bookingCollection = client.db("opal-blosomDb").collection("bookings");
+    const useCollection = client.db("opal-blosomDb").collection("userDb");
+
+    // user collection
+    app.post("/Alluser", async (req, res) => {
+      const user = req.body;
+      const result = await useCollection.insertOne(user);
+      res.send(result);
+    });
 
     // room api
     app.get("/allroom", async (req, res) => {
@@ -53,6 +62,27 @@ async function run() {
         },
       };
       const result = await rommCollection.findOne(query, options);
+      res.send(result);
+    });
+    app.post("/bookings", async (req, res) => {
+      const bokkingdata = req.body;
+      console.log(bokkingdata);
+      const result = await bookingCollection.insertOne(bokkingdata);
+      res.send(result);
+    });
+
+    app.get("/Allbookings", async (req, res) => {
+      const query = bookingCollection.find();
+      const result = await query.toArray();
+      res.send(result);
+    });
+
+    app.get("/mybooking", async (req, res) => {
+      let query = {};
+      if (req.query.email) {
+        query = { userEmail: req.query.email };
+      }
+      const result = await bookingCollection.find(query).toArray();
       res.send(result);
     });
 
